@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div>Recipe Manager</div>
+</header>
+
+<!-- Login Section -->
+<div class="container" id="loginContainer">
+    <h2>Login</h2>
+    <form id="loginForm" onsubmit="login(event)">
+        <input type="text" id="loginUsername" placeholder="Username" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit">Login</button>
+        <p>Don't have an account? <a href="javascript:showSignupForm()">Sign Up</a></p>
+        <p id="loginError" style="color: red;"></p>
+    </form>
+</div>
+
+<!-- Sign Up Section -->
+<div class="container" id="signupContainer" style="display: none;">
+    <h2>Sign Up</h2>
+    <form id="signupForm" onsubmit="signup(event)">
+        <input type="text" id="signupUsername" placeholder="Username" required>
+        <input type="password" id="signupPassword" placeholder="Password (min. 8 characters, at least one letter and one special character)" required>
+        <button type="submit">Sign Up</button>
+        <p>Already have an account? <a href="javascript:showLoginForm()">Login</a></p>
+        <p id="signupError" style="color: red;"></p>
+    </form>
+</div>
+
+<!-- Recipe Management Section -->
+<div class="container" id="recipeContainer" style="display: none;">
+    <h2>Search Recipes</h2>
+    <input type="text" id="searchQuery" placeholder="Enter search term">
+    <select id="searchFilter">
+        <option value="id">ID</option>
+        <option value="title">Title</option>
+        <option value="ingredients">Ingredient</option>
+        <option value="instructions">Instruction</option>
+    </select>
+    <button onclick="searchRecipes()">Search</button>
+    <pre id="searchResult"></pre>
+
+    <h2>Add Recipe</h2>
+    <input type="text" id="id" placeholder="Recipe ID">
+    <input type="text" id="title" placeholder="Title">
+    <textarea id="ingredients" placeholder="Ingredients"></textarea>
+    <textarea id="instructions" placeholder="Instructions"></textarea>
+    <button onclick="addRecipe()">Add</button>
+
+    <h2>Update Recipe</h2>
+    <input type="text" id="updateId" placeholder="Recipe ID">
+    <input type="text" id="updateTitle" placeholder="Title">
+    <textarea id="updateIngredients" placeholder="Ingredients"></textarea>
+    <textarea id="updateInstructions" placeholder="Instructions"></textarea>
+    <button onclick="updateRecipe()">Update</button>
+
+    <h2>Delete Recipe</h2>
+    <input type="text" id="deleteId" placeholder="Recipe ID">
+    <button onclick="deleteRecipe()">Delete</button>
+
+    <h2>Display Recipe</h2>
+    <input type="text" id="getId" placeholder="Enter Recipe ID">
+    <button onclick="getRecipeById()">Get Recipe</button>
+    <pre id="getIdOutput"></pre>
+
+    <h2>Display All Recipes</h2>
+    <button onclick="getallRecipes()">Display</button>
+    <pre id="output"></pre>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+    const baseUrl = "http://localhost:8080/api";
+    let userSession = null;
+
+    function showSignupForm() {
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('signupContainer').style.display = 'block';
+    }
+
+    function showLoginForm() {
+        document.getElementById('signupContainer').style.display = 'none';
+        document.getElementById('loginContainer').style.display = 'block';
+    }
+
+    async function signup(event) {
+        event.preventDefault();
+        const username = document.getElementById('signupUsername').value;
+        const password = document.getElementById('signupPassword').value;
+
+        // Frontend validation for password
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            document.getElementById("signupError").innerText = "Password must be at least 8 characters long and contain at least one letter and one special character.";
+            return;
+        }
+
+        const res = await fetch(`${baseUrl}/signup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.text();
+        if (data === "Username already exists.") {
+            document.getElementById("signupError").innerText = data;
+        } else {
+            alert("Signup successful, you can now login.");
+            showLoginForm();
+        }
+    }
+
+    async function login(event) {
+        event.preventDefault();
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+
+        const res = await fetch(`${baseUrl}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            userSession = data.user;
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('recipeContainer').style.display = 'block';
+        } else {
+            document.getElementById('loginError').innerText = "Invalid credentials, please try again!";
+        }
+    }
+
+    async function logout() {
+        userSession = null;
+        document.getElementById('recipeContainer').style.display = 'none';
+        showLoginForm();
+    }
+
+    async function addRecipe() {
+        const id = document.getElementById("id").value;
+        const title = document.getElementById("title").value;
+        const ingredients = document.getElementById("ingredients").value.split(",");
+        const instructions = document.getElementById("instructions").value.split(",");
+
+        if (!id || !title || ingredients.length === 0 || instructions.length === 0) {
+            alert("All fields are required!");
+            return;
+        }
+
+        const res = await fetch(`${baseUrl}/addRecipe`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, title, ingredients, instructions })
+        });
+
+        const text = await res.text();
+        alert(text);
+    }
+
+    async function updateRecipe() {
+        const id = document.getElementById("updateId").value;
+        const title = document.getElementById("updateTitle").value;
+        const ingredients = document.getElementById("updateIngredients").value.split(",");
+        const instructions = document.getElementById("updateInstructions").value.split(",");
+
+        if (!id || !title || ingredients.length === 0 || instructions.length === 0) {
+            alert("All fields are required!");
+            return;
+        }
+
+        const res = await fetch(`${baseUrl}/updateRecipe`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, title, ingredients, instructions })
+        });
+
+        const text = await res.text();
+        alert(text);
+    }
+
+    async function deleteRecipe() {
+        const id = document.getElementById("deleteId").value;
+
+        if (!id) {
+            alert("Please provide the Recipe ID.");
+            return;
+        }
+
+        const res = await fetch(`${baseUrl}/deleteRecipe/${id}`, {
+            method: "DELETE"
+        });
+
+        const text = await res.text();
+        alert(text);
+    }
+
+    async function getRecipeById() {
+        const id = document.getElementById("getId").value;
+
+        if (!id) {
+            alert("Please provide the Recipe ID.");
+            return;
+        }
+
+        const res = await fetch(`${baseUrl}/getRecipe/${id}`, {
+            method: "GET"
+        });
+
+        const data = await res.json();
+        document.getElementById("getIdOutput").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function getallRecipes() {
+        const res = await fetch(`${baseUrl}/getallRecipes`, {
+            method: "GET"
+        });
+
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function searchRecipes() {
+        const query = document.getElementById("searchQuery").value;
+        const filter = document.getElementById("searchFilter").value;
+
+        if (!query) {
+            alert("Please enter a search term.");
+            return;
+        }
+
+        const res = await fetch(`${baseUrl}/searchRecipes?${filter}=${query}`, {
+            method: "GET"
+        });
+
+        const data = await res.json();
+        document.getElementById("searchResult").textContent = JSON.stringify(data, null, 2);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #e0f7fa, #e1f5fe);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #00796b;
+    color: white;
+    padding: 25px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.container h2 {
+    color: #00695c;
+    border-bottom: 2px solid #00796b;
+    padding-bottom: 8px;
+    margin-top: 40px;
+    font-size: 22px;
+}
+
+input[type="text"],
+input[type="password"], /* Added for password input */
+textarea,
+select {
+    width: 100%;
+    padding: 14px;
+    margin: 14px 0;
+    border: 1px solid #b2dfdb;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus, /* Focus effect for password */
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #00796b;
+    box-shadow: 0 0 8px rgba(0, 121, 107, 0.2);
+}
+
+/* Added this block to make password box same size and shape as username */
+#loginContainer form input[type="password"],
+#signupContainer form input[type="password"],
+#loginContainer form input[type="text"],
+#signupContainer form input[type="text"] {
+    width: 100%;
+    height: 50px; /* Same height for username and password */
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #00796b;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 12px;
+}
+
+button:hover {
+    background-color: #004d40;
+}
+
+/* Adjusting size of other buttons like displayAll, display, update, delete, add, search, logout */
+button#displayAll,
+button#display,
+button#update,
+button#delete,
+button#add,
+button#search,
+button#logout {
+    width: auto; /* Set to auto width to allow for dynamic sizing */
+    padding: 10px 20px; /* Reset padding to maintain the original size */
+    font-size: 16px; /* Ensure font size stays consistent */
+    margin-top: 8px; /* Space between buttons */
+}
+
+button:hover {
+    background-color: #004d40;
+}
+
+pre#output,
+pre#searchResult,
+pre#getIdOutput {
+    background-color: #f1f8e9;
+    padding: 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    color: #2e7d32;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-top: 20px;
+    border: 1px solid #c5e1a5;
+}
+
+h2:first-of-type {
+    margin-top: 0;
+}
+
+/* Added additional improvements */
+a {
+    color: #00796b;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button:focus {
+    outline: none;
+    border: 2px solid #004d40;
+}
+
+input[type="text"], textarea {
+    background-color: #fafafa;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    background-color: #ffffff;
+}
+
+.container .container {
+    max-width: 500px;
+}
